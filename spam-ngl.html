@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGL Spam Tool - DictiveCore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-black: #0a0a0a;
+            --carbon-dark: #121212;
+            --carbon-medium: #1a1a1a;
+            --carbon-light: #2a2a2a;
+            --accent-purple: #b19cd9;
+            --accent-purple-light: #d8c8ff;
+            --accent-purple-dark: #8a6bc9;
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --success: #00C851;
+            --error: #ff4444;
+            --warning: #ffaa00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--primary-black);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(177, 156, 217, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(216, 200, 255, 0.08) 0%, transparent 50%),
+                var(--primary-black);
+            z-index: -2;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .page-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, white, var(--accent-purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(177, 156, 217, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .limit-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .limit-header {
+            text-align: center;
+            margin-bottom: 15px;
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .limit-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .limit-label {
+            color: #bbb;
+            font-weight: 500;
+        }
+
+        .limit-value {
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        .quick-stats {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quick-stats h3 {
+            font-family: 'Orbitron', monospace;
+            color: #fff;
+            margin: 0 0 20px 0;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95em;
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .input-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--accent-purple-light);
+            box-shadow: 0 0 0 2px rgba(177, 156, 217, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 6px 20px rgba(139, 95, 191, 0.3);
+        }
+
+        .stat-card-small {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card-small:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+        }
+        
+        .stat-card-small .stat-label {
+            font-size: 12px;
+            color: #bbb;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card-small .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .stat-card-small .stat-progress {
+            background: rgba(0,0,0,0.3);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .stat-card-small .stat-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-purple-light));
+            border-radius: 3px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .range-group input[type="range"] {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .range-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-purple-light);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(177, 156, 217, 0.4);
+        }
+
+        .range-group input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: var(--accent-purple-light);
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+
+        .range-group input[type="number"] {
+            min-width: 70px;
+            text-align: center;
+            background: var(--accent-purple);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+            font-family: 'Orbitron', monospace;
+            border: none;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .quick-btn {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .quick-btn:hover {
+            background: var(--accent-purple);
+            color: var(--primary-black);
+            transform: translateY(-2px);
+        }
+
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-purple-light));
+            border-radius: 10px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .btn {
+            padding: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
+            color: white;
+            box-shadow: 0 6px 20px rgba(139, 95, 191, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(177, 156, 217, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(177, 156, 217, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .log-container {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            margin-top: 20px;
+            height: 250px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .log-entry {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.85em;
+            font-family: 'Courier New', monospace;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-success {
+            color: var(--success);
+        }
+
+        .log-error {
+            color: var(--error);
+        }
+
+        .log-info {
+            color: var(--accent-purple-light);
+        }
+
+        .log-warning {
+            color: var(--warning);
+        }
+
+        .log-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb {
+            background: var(--accent-purple);
+            border-radius: 4px;
+        }
+
+        #limitWarning {
+            padding: 12px;
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid var(--error);
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 15px;
+            color: var(--error);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .page-title {
+                font-size: 1.6em;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animasi */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .fas, .fab {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="card">
+            <h1 class="page-title"><i class="fas fa-message"></i> NGL Spam Tool</h1>
+            <div class="page-subtitle">Advanced Message Delivery System for NGL.link</div>
+        </div>
+
+        <!-- Limit Info -->
+        <div class="card">
+            <div class="limit-info">
+                <div class="limit-header">
+                    <i class="fas fa-shield-alt"></i> Limit Harian Kamu
+                </div>
+                <div class="limit-row">
+                    <span class="limit-label">Digunakan Hari Ini:</span>
+                    <span class="limit-value" id="usageToday">0 / 200 pesan</span>
+                </div>
+                <div class="limit-row">
+                    <span class="limit-label">Sisa Limit:</span>
+                    <span class="limit-value" id="remainingLimit">200 pesan</span>
+                </div>
+                <div class="limit-row">
+                    <span class="limit-label">Reset:</span>
+                    <span class="limit-value">Midnight (00:00 WIB)</span>
+                </div>
+                <div class="limit-row">
+                    <span class="limit-label">Max Per Request:</span>
+                    <span class="limit-value">100 pesan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card">
+            <div class="quick-stats">
+                <h3><i class="fas fa-chart-pie"></i> Statistik Penggunaan</h3>
+                <div class="stats-grid">
+                    <div class="stat-card-small">
+                        <div class="stat-label"><i class="fas fa-user-plus"></i> User Limit</div>
+                        <div class="stat-number">200</div>
+                        <div class="stat-label">limit per user</div>
+                    </div>
+                    
+                    <div class="stat-card-small">
+                        <div class="stat-label"><i class="fas fa-user"></i> Penggunaan Kamu</div>
+                        <div class="stat-number" id="usageStat">0<span style="font-size: 14px; color: #888;">/200</span></div>
+                        <div class="stat-progress">
+                            <div class="stat-progress-fill" id="usageProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card-small">
+                        <div class="stat-label"><i class="fas fa-check-circle"></i> Sisa Limit</div>
+                        <div class="stat-number" id="remainingStat">200</div>
+                        <div class="stat-label">pesan tersisa hari ini</div>
+                    </div>
+
+                    <div class="stat-card-small">
+                        <div class="stat-label"><i class="fas fa-clock"></i> Reset Dalam</div>
+                        <div class="stat-number" id="resetTimer">--:--:--</div>
+                        <div class="stat-label">(Midnight WIB)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form -->
+        <div class="card">
+            <div class="input-group">
+                <label><i class="fas fa-user"></i> Username Target NGL</label>
+                <input type="text" id="target" placeholder="Masukkan username NGL (tanpa @)...">
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-comment-alt"></i> Pesan untuk Spam</label>
+                <textarea id="message" placeholder="Masukkan pesan yang ingin di-spam...">Hallo</textarea>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="sentCount">0</div>
+                    <div class="stat-label">Messages Sent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successCount">0</div>
+                    <div class="stat-label">Successful</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="errorCount">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="input-group">
+                <label><i class="fas fa-paper-plane"></i> Message Count</label>
+                <div class="range-group">
+                    <input type="range" id="countRange" min="1" max="100" value="10">
+                    <input type="number" id="count" min="1" max="100" value="10">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label><i class="fas fa-clock"></i> Delay (milliseconds)</label>
+                <div class="range-group">
+                    <input type="range" id="delayRange" min="100" max="5000" step="100" value="1000">
+                    <input type="number" id="delay" min="100" max="10000" value="1000">
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-grid">
+                <button class="quick-btn"><i class="fas fa-bolt"></i> Fast (5 msg)</button>
+                <button class="quick-btn"><i class="fas fa-running"></i> Medium (20 msg)</button>
+                <button class="quick-btn"><i class="fas fa-skull"></i> Heavy (50 msg)</button>
+                <button class="quick-btn"><i class="fas fa-fire"></i> Extreme (100 msg)</button>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="attackBtn">
+                    <i class="fas fa-play"></i> Start Attack
+                </button>
+                <button class="btn btn-secondary" id="clearBtn">
+                    <i class="fas fa-broom"></i> Clear Log
+                </button>
+            </div>
+
+            <div id="limitWarning" style="display: none;">
+                ⚠️ Limit harian kamu sudah habis. Reset di midnight.
+            </div>
+        </div>
+
+        <!-- Log -->
+        <div class="card">
+            <div class="log-container" id="log">
+                <div class="log-entry log-info">🚀 System ready. Waiting for attack command...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let isAttacking = false;
+        let sentCount = 0;
+        let successCount = 0;
+        let errorCount = 0;
+        const DAILY_LIMIT = 200;
+        const MAX_PER_REQUEST = 100;
+
+        // Get elements
+        const targetInput = document.getElementById('target');
+        const messageInput = document.getElementById('message');
+        const countInput = document.getElementById('count');
+        const countRange = document.getElementById('countRange');
+        const delayInput = document.getElementById('delay');
+        const delayRange = document.getElementById('delayRange');
+        const attackBtn = document.getElementById('attackBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressFill = document.getElementById('progressFill');
+        const logContainer = document.getElementById('log');
+        const sentCountEl = document.getElementById('sentCount');
+        const successCountEl = document.getElementById('successCount');
+        const errorCountEl = document.getElementById('errorCount');
+        const limitWarning = document.getElementById('limitWarning');
+
+        // Initialize
+        function init() {
+            checkDailyLimit();
+            updateResetTimer();
+            setInterval(updateResetTimer, 1000);
+            
+            // Sync range and number inputs
+            countRange.addEventListener('input', () => {
+                countInput.value = countRange.value;
+            });
+            
+            countInput.addEventListener('input', () => {
+                countRange.value = countInput.value;
+            });
+            
+            delayRange.addEventListener('input', () => {
+                delayInput.value = delayRange.value;
+            });
+            
+            delayInput.addEventListener('input', () => {
+                delayRange.value = delayInput.value;
+            });
+
+            // Quick preset buttons
+            const quickBtns = document.querySelectorAll('.quick-btn');
+            quickBtns[0].addEventListener('click', () => setPreset(5, 500));
+            quickBtns[1].addEventListener('click', () => setPreset(20, 800));
+            quickBtns[2].addEventListener('click', () => setPreset(50, 1000));
+            quickBtns[3].addEventListener('click', () => setPreset(100, 1500));
+
+            // Attack button
+            attackBtn.addEventListener('click', startAttack);
+            
+            // Clear button
+            clearBtn.addEventListener('click', () => {
+                logContainer.innerHTML = '<div class="log-entry log-info">🧹 Log cleared.</div>';
+            });
+        }
+
+        // Set preset
+        function setPreset(count, delay) {
+            countInput.value = count;
+            countRange.value = count;
+            delayInput.value = delay;
+            delayRange.value = delay;
+            addLog('info', `⚙️ Preset loaded: ${count} messages with ${delay}ms delay`);
+        }
+
+        // Check and update daily limit
+        function checkDailyLimit() {
+            const today = new Date().toDateString();
+            const stored = JSON.parse(localStorage.getItem('nglSpamData') || '{}');
+            
+            if (stored.date !== today) {
+                // Reset for new day
+                stored.date = today;
+                stored.used = 0;
+                localStorage.setItem('nglSpamData', JSON.stringify(stored));
+            }
+            
+            const used = stored.used || 0;
+            const remaining = DAILY_LIMIT - used;
+            
+            // Update UI
+            document.getElementById('usageToday').textContent = `${used} / ${DAILY_LIMIT} pesan`;
+            document.getElementById('remainingLimit').textContent = `${remaining} pesan`;
+            document.getElementById('usageStat').innerHTML = `${used}<span style="font-size: 14px; color: #888;">/200</span>`;
+            document.getElementById('remainingStat').textContent = remaining;
+            
+            const percentage = (used / DAILY_LIMIT) * 100;
+            document.getElementById('usageProgress').style.width = `${percentage}%`;
+            
+            // Show warning if limit reached
+            if (remaining <= 0) {
+                limitWarning.style.display = 'block';
+                attackBtn.disabled = true;
+            } else {
+                limitWarning.style.display = 'none';
+                attackBtn.disabled = false;
+            }
+            
+            return remaining;
+        }
+
+        // Update countdown timer to midnight
+        function updateResetTimer() {
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(24, 0, 0, 0);
+            
+            const diff = midnight - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            const timerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('resetTimer').textContent = timerText;
+        }
+
+        // Add log entry
+        function addLog(type, message) {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString('id-ID');
+            entry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Generate random device ID
+        function generateDeviceId() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        // Send single message to NGL using form submission trick
+        async function sendMessage(username, message) {
+            const deviceId = generateDeviceId();
+            
+            return new Promise((resolve) => {
+                // Create hidden iframe
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.name = 'ngl_frame_' + Date.now();
+                document.body.appendChild(iframe);
+                
+                // Create form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://ngl.link/api/submit';
+                form.target = iframe.name;
+                form.style.display = 'none';
+                
+                // Add form fields
+                const fields = {
+                    username: username,
+                    question: message,
+                    deviceId: deviceId,
+                    gameSlug: '',
+                    referrer: ''
+                };
+                
+                for (let key in fields) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = fields[key];
+                    form.appendChild(input);
+                }
+                
+                document.body.appendChild(form);
+                
+                // Submit form
+                form.submit();
+                
+                // Cleanup and resolve after short delay
+                setTimeout(() => {
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                    resolve({ success: true });
+                }, 500);
+            });
+        }
+
+        // Start attack
+        async function startAttack() {
+            const target = targetInput.value.trim();
+            const message = messageInput.value.trim();
+            const count = parseInt(countInput.value);
+            const delay = parseInt(delayInput.value);
+
+            // Validation
+            if (!target) {
+                addLog('error', '❌ Username target tidak boleh kosong!');
+                return;
+            }
+
+            if (!message) {
+                addLog('error', '❌ Pesan tidak boleh kosong!');
+                return;
+            }
+
+            if (count < 1 || count > MAX_PER_REQUEST) {
+                addLog('error', `❌ Jumlah pesan harus antara 1-${MAX_PER_REQUEST}!`);
+                return;
+            }
+
+            // Check daily limit
+            const remaining = checkDailyLimit();
+            if (remaining <= 0) {
+                addLog('error', '❌ Limit harian sudah habis! Reset di midnight.');
+                return;
+            }
+
+            if (count > remaining) {
+                addLog('warning', `⚠️ Jumlah pesan melebihi sisa limit. Akan dikirim ${remaining} pesan saja.`);
+                countInput.value = remaining;
+                countRange.value = remaining;
+                return;
+            }
+
+            // Start attack
+            isAttacking = true;
+            attackBtn.disabled = true;
+            attackBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Attacking...';
+            
+            sentCount = 0;
+            successCount = 0;
+            errorCount = 0;
+            updateStats();
+
+            addLog('info', `🚀 Starting attack on @${target} with ${count} messages...`);
+
+            for (let i = 0; i < count; i++) {
+                if (!isAttacking) break;
+
+                sentCount++;
+                updateStats();
+                updateProgress(sentCount, count);
+
+                const result = await sendMessage(target, message);
+
+                if (result.success) {
+                    successCount++;
+                    addLog('success', `✅ Message ${sentCount}/${count} sent successfully`);
+                } else {
+                    errorCount++;
+                    addLog('error', `❌ Message ${sentCount}/${count} failed: ${result.error}`);
+                }
+
+                updateStats();
+
+                // Update daily usage
+                const stored = JSON.parse(localStorage.getItem('nglSpamData') || '{}');
+                stored.used = (stored.used || 0) + 1;
+                localStorage.setItem('nglSpamData', JSON.stringify(stored));
+                checkDailyLimit();
+
+                // Delay before next message
+                if (i < count - 1) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+            // Attack complete
+            isAttacking = false;
+            attackBtn.disabled = false;
+            attackBtn.innerHTML = '<i class="fas fa-play"></i> Start Attack';
+            progressFill.style.width = '100%';
+
+            addLog('info', `🏁 Attack completed! Success: ${successCount}, Failed: ${errorCount}`);
+        }
+
+        // Update stats display
+        function updateStats() {
+            sentCountEl.textContent = sentCount;
+            successCountEl.textContent = successCount;
+            errorCountEl.textContent = errorCount;
+        }
+
+        // Update progress bar
+        function updateProgress(current, total) {
+            const percentage = (current / total) * 100;
+            progressFill.style.width = `${percentage}%`;
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body>
+</html>
