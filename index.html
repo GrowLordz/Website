@@ -776,16 +776,16 @@
     
     // Prevent form submission animation issues on mobile
     document.querySelector('form').addEventListener('submit', function(e) {
-      const button = this.querySelector('button[type="submit"]');
-      button.disabled = true;
-      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
-      
-      // Simulate processing delay
-      setTimeout(() => {
-        button.disabled = false;
-        button.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> MASUK';
-      }, 2000);
-    });
+  e.preventDefault(); // stop submit asli
+
+  const button = this.querySelector('button[type="submit"]');
+  button.disabled = true;
+  button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESSING...';
+
+  setTimeout(() => {
+    window.location.href = "dashboard.html";  // redirect ke dashboard
+  }, 1500);
+});
   </script>
 </body>
 </html>
